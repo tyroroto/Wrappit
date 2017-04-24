@@ -10,9 +10,18 @@ namespace WrapitApplication
 {
     public partial class Form1 : Form
     {
+        private Setting _setting;
+
         public Form1()
         {
             InitializeComponent();
+            _setting = new Setting();
+            if (!_setting.ResizeEnable)
+            {
+                MaximizeBox = false;
+            }
+            Size = _setting.DefaultSize;
+            Text = _setting.AppTitle;
             InitializeCef();
         }
 
@@ -32,7 +41,8 @@ namespace WrapitApplication
             };
             browser.ConsoleMessage += BrowserOnConsoleMessage;
             appPanel.Controls.Add(browser);
-
+            browser.RegisterJsObject("AppController",new AppControllerBinder(this));
+        
         }
 
         private void BrowserOnConsoleMessage(object sender, ConsoleMessageEventArgs consoleMessageEventArgs)
@@ -41,8 +51,7 @@ namespace WrapitApplication
         }
     }
 
-
-
+ 
     public class CefSharpSchemeHandler : ResourceHandler
     {
         public override bool ProcessRequestAsync(IRequest request, ICallback callback)
